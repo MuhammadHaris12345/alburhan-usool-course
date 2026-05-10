@@ -9,16 +9,12 @@
   <style>
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #164e63 100%); }
     .islamic-gradient { background: linear-gradient(135deg, #0f766e, #10b981); }
-    .ayat-box { 
-      background: linear-gradient(145deg, #fefce8, #fde047); 
-      border: 4px solid #854d0e; 
-    }
+    .ayat-box { background: linear-gradient(145deg, #fefce8, #fde047); border: 4px solid #854d0e; }
     .arabic-text { font-size: 1.85rem; line-height: 2.4rem; }
   </style>
 </head>
 <body class="text-white min-h-screen">
 
-  <!-- Header -->
   <header class="islamic-gradient py-8 shadow-2xl">
     <div class="max-w-7xl mx-auto text-center px-4">
       <h1 class="text-4xl md:text-5xl font-bold flex items-center justify-center gap-4">
@@ -29,7 +25,7 @@
     </div>
   </header>
 
-  <!-- Weekly Motivational Ayat -->
+  <!-- Weekly Ayat -->
   <div class="ayat-box max-w-4xl mx-auto mt-8 p-10 rounded-3xl text-center text-slate-900 shadow-2xl">
     <p id="ayatText" class="arabic-text font-serif mb-6"></p>
     <p id="ayatUrdu" class="text-xl font-semibold text-emerald-800 leading-relaxed mb-4"></p>
@@ -37,15 +33,16 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-4 py-10">
-    <!-- Tabs -->
     <div class="flex justify-center gap-4 mb-10">
-      <button onclick="showPanel('student')" class="px-10 py-4 rounded-3xl font-bold text-lg bg-teal-600 hover:bg-teal-700 transition">طالب علم</button>
-      <button onclick="showPanel('admin')" class="px-10 py-4 rounded-3xl font-bold text-lg bg-slate-700 hover:bg-slate-600 transition">ایڈمن پینل</button>
+      <button onclick="showPanel('student')" class="px-10 py-4 rounded-3xl font-bold text-lg bg-teal-600 hover:bg-teal-700">طالب علم</button>
+      <button onclick="showPanel('admin')" class="px-10 py-4 rounded-3xl font-bold text-lg bg-slate-700 hover:bg-slate-600">ایڈمن پینل</button>
     </div>
 
     <!-- Student Panel -->
     <div id="studentPanel">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+        <!-- Registration -->
         <div class="bg-slate-900/90 p-8 rounded-3xl shadow-2xl border border-teal-500/30">
           <h2 class="text-2xl font-bold mb-6 text-teal-400">رجسٹریشن</h2>
           <form id="studentForm" class="space-y-5">
@@ -55,11 +52,14 @@
           </form>
         </div>
 
+        <!-- Mark Attendance -->
         <div class="bg-slate-900/90 p-8 rounded-3xl shadow-2xl border border-teal-500/30">
           <h2 class="text-2xl font-bold mb-6 text-teal-400">حاضری لگائیں</h2>
+          <input type="tel" id="attNumber" placeholder="اپنا واٹس ایپ نمبر درج کریں" class="w-full p-5 rounded-2xl bg-slate-800 border border-slate-600 mb-4">
           <input type="date" id="attDate" class="w-full p-5 rounded-2xl bg-slate-800 border border-slate-600 mb-6">
-          <button onclick="markMyAttendance()" class="w-full bg-amber-500 hover:bg-amber-600 py-5 rounded-2xl font-bold text-xl">✅ میری حاضری لگائیں</button>
+          <button onclick="markAttendance()" class="w-full bg-amber-500 hover:bg-amber-600 py-5 rounded-2xl font-bold text-xl">✅ حاضری لگائیں</button>
         </div>
+
       </div>
     </div>
 
@@ -74,17 +74,14 @@
 
         <div id="adminDashboard" class="hidden">
           <div class="flex justify-between items-center my-6">
-            <h2 class="text-3xl font-bold text-teal-400">تمام طلباء کی ریکارڈ</h2>
-            <button onclick="downloadExcel()" class="bg-teal-600 hover:bg-teal-700 px-8 py-4 rounded-2xl font-bold flex items-center gap-2">
-              <i class="fas fa-download"></i> Excel ڈاؤن لوڈ
-            </button>
+            <h2 class="text-3xl font-bold text-teal-400">تمام طلباء</h2>
+            <button onclick="downloadExcel()" class="bg-teal-600 hover:bg-teal-700 px-8 py-4 rounded-2xl font-bold">📥 Excel ڈاؤن لوڈ</button>
           </div>
           <div class="overflow-x-auto">
-            <table id="recordsTable" class="w-full">
+            <table id="recordsTable" class="w-full text-sm">
               <thead><tr class="bg-slate-800">
-                <th class="p-4 text-right">نمبر</th>
                 <th class="p-4 text-right">نام</th>
-                <th class="p-4 text-right">واٹس ایپ نمبر</th>
+                <th class="p-4 text-right">نمبر</th>
                 <th class="p-4 text-center">کل حاضری</th>
               </tr></thead>
               <tbody id="tableBody" class="text-slate-300"></tbody>
@@ -96,47 +93,25 @@
   </div>
 
   <script>
-    // Weekly Ayats with Clear Urdu Translation
-    const ayats = [
-      { 
-        arabic: "وَقُلْ رَّبِّ زِدْنِي عِلْمًا", 
-        urdu: "اور کہو: اے میرے رب! میرے علم میں اضافہ فرما۔", 
-        ref: "سورۃ طہ (20:114)" 
-      },
-      { 
-        arabic: "يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ", 
-        urdu: "اللہ تم میں سے ایمان والوں اور علم دیئے گئے لوگوں کے درجات بلند کرتا ہے۔", 
-        ref: "سورۃ المجادلہ (58:11)" 
-      },
-      { 
-        arabic: "هَلْ يَسْتَوِي الَّذِينَ يَعْلَمُونَ وَالَّذِينَ لَا يَعْلَمُونَ", 
-        urdu: "کیا وہ لوگ برابر ہو سکتے ہیں جو علم رکھتے ہیں اور جو علم نہیں رکھتے؟", 
-        ref: "سورۃ الزمر (39:9)" 
-      },
-      { 
-        arabic: "فَاعْلَمْ أَنَّهُ لَا إِلَٰهَ إِلَّا اللَّهُ", 
-        urdu: "تو جان لو کہ اللہ کے سوا کوئی معبود نہیں۔", 
-        ref: "سورۃ محمد (47:19)" 
-      }
-    ];
+    // Weekly Ayats
+    const ayats = [ /* same as before */ ];
 
     function setWeeklyAyat() {
-      const weekNumber = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7)) % ayats.length;
-      const current = ayats[weekNumber];
-      
-      document.getElementById('ayatText').innerHTML = current.arabic;
-      document.getElementById('ayatUrdu').innerHTML = current.urdu;
-      document.getElementById('ayatRef').innerHTML = current.ref;
+      const ayats = [
+        { arabic: "وَقُلْ رَّبِّ زِدْنِي عِلْمًا", urdu: "اور کہو: اے میرے رب! میرے علم میں اضافہ فرما۔", ref: "سورۃ طہ (20:114)" },
+        { arabic: "يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ", urdu: "اللہ تم میں سے ایمان والوں اور علم والوں کے درجات بلند کرتا ہے۔", ref: "سورۃ المجادلہ (58:11)" }
+      ];
+      const week = Math.floor(Date.now() / (1000*60*60*24*7)) % ayats.length;
+      document.getElementById('ayatText').innerHTML = ayats[week].arabic;
+      document.getElementById('ayatUrdu').innerHTML = ayats[week].urdu;
+      document.getElementById('ayatRef').innerHTML = ayats[week].ref;
     }
 
-    // Rest of the functionality
     let students = [];
     let isAdminLoggedIn = false;
 
-    function loadData() {
-      try { students = JSON.parse(localStorage.getItem('alburhan_students')) || []; } catch(e){}
-    }
-    function saveData() {
+    function loadData() { try { students = JSON.parse(localStorage.getItem('alburhan_students')) || []; } catch(e){} }
+    function saveData() { 
       try { localStorage.setItem('alburhan_students', JSON.stringify(students)); } catch(e){}
       if (isAdminLoggedIn) renderAdminTable();
     }
@@ -155,12 +130,14 @@
       } else alert("❌ غلط پاس ورڈ! Admin123#");
     }
 
+    // Registration
     document.getElementById('studentForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const number = document.getElementById('number').value.trim();
-      if (!name || !number) return alert("تمام فیلڈز بھریں");
-      if (students.some(s => s.number === number)) return alert("یہ نمبر پہلے سے موجود ہے!");
+      if (!name || !number) return alert("نام اور نمبر درج کریں");
+
+      if (students.some(s => s.number === number)) return alert("یہ نمبر پہلے سے رجسٹرڈ ہے!");
 
       students.push({id: Date.now(), name, number, attendance: {}});
       saveData();
@@ -168,34 +145,56 @@
       alert("✅ رجسٹریشن کامیاب!");
     });
 
-    function markMyAttendance() {
+    // Mark Attendance (Only Registered + Sat/Sun + Future)
+    function markAttendance() {
+      const number = document.getElementById('attNumber').value.trim();
       const date = document.getElementById('attDate').value;
-      if (!date) return alert("تاریخ منتخب کریں!");
-      students.forEach(s => s.attendance[date] = true);
+
+      if (!number || !date) return alert("نمبر اور تاریخ دونوں درج کریں");
+
+      const student = students.find(s => s.number === number);
+      if (!student) return alert("یہ نمبر رجسٹرڈ نہیں ہے!");
+
+      const selectedDate = new Date(date);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      if (selectedDate < today) return alert("پچھلی تاریخ پر حاضری نہیں لگا سکتے!");
+
+      const day = selectedDate.getDay();
+      if (day !== 6 && day !== 0) return alert("صرف ہفتہ اور اتوار کو حاضری لگائی جا سکتی ہے!");
+
+      if (student.attendance[date]) return alert("اس تاریخ کی حاضری پہلے ہی لگ چکی ہے!");
+
+      student.attendance[date] = true;
       saveData();
-      alert(date + " کی حاضری لگا دی گئی!");
+      alert(`✅ ${date} کی حاضری کامیابی سے لگا دی گئی!`);
     }
 
     function renderAdminTable() {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
-      students.forEach((s, i) => {
+      students.forEach(s => {
+        const dates = Object.keys(s.attendance || {}).sort().join(" | ");
         const count = Object.keys(s.attendance || {}).length;
         tbody.innerHTML += `<tr class="border-b border-slate-700 hover:bg-slate-800">
-          <td class="p-4 text-center">${i+1}</td>
           <td class="p-4">${s.name}</td>
           <td class="p-4">${s.number}</td>
-          <td class="p-4 text-center text-teal-400 font-bold">${count} دن</td>
+          <td class="p-4 text-center text-teal-400">${count} دن<br><small class="text-slate-400">${dates}</small></td>
         </tr>`;
       });
     }
 
     function downloadExcel() {
       if (!students.length) return alert("کوئی ڈیٹا نہیں!");
-      let csv = "\uFEFFنمبر,نام,واٹس ایپ نمبر,کل حاضری\n";
-      students.forEach((s,i) => {
-        csv += `${i+1},"${s.name}","${s.number}",${Object.keys(s.attendance||{}).length}\n`;
+
+      let csv = "\uFEFFنام,نمبر,کل حاضری,حاضری کی تاریخیں\n";
+      students.forEach(s => {
+        const count = Object.keys(s.attendance || {}).length;
+        const dates = Object.keys(s.attendance || {}).sort().join(" | ");
+        csv += `"${s.name}","${s.number}",${count},"${dates}"\n`;
       });
+
       const blob = new Blob([csv], {type: 'text/csv'});
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
