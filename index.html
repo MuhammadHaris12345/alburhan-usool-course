@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALBURHAN AL USOOL COURSE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #164e63 100%); }
+    .islamic-gradient { background: linear-gradient(135deg, #0f766e, #10b981); }
+    .ayat-box { 
+      background: linear-gradient(145deg, #fefce8, #fde047); 
+      border: 4px solid #854d0e; 
+    }
+    .arabic-text { font-size: 1.85rem; line-height: 2.4rem; }
+  </style>
+</head>
+<body class="text-white min-h-screen">
+
+  <!-- Header -->
+  <header class="islamic-gradient py-8 shadow-2xl">
+    <div class="max-w-7xl mx-auto text-center px-4">
+      <h1 class="text-4xl md:text-5xl font-bold flex items-center justify-center gap-4">
+        <i class="fas fa-book-quran text-amber-300"></i>
+        ALBURHAN AL USOOL COURSE
+      </h1>
+      <p class="text-teal-100 mt-3 text-xl">طلبِ علم کی سعادت</p>
+    </div>
+  </header>
+
+  <!-- Weekly Motivational Ayat -->
+  <div class="ayat-box max-w-4xl mx-auto mt-8 p-10 rounded-3xl text-center text-slate-900 shadow-2xl">
+    <p id="ayatText" class="arabic-text font-serif mb-6"></p>
+    <p id="ayatUrdu" class="text-xl font-semibold text-emerald-800 leading-relaxed mb-4"></p>
+    <p id="ayatRef" class="text-lg font-medium text-amber-900"></p>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <!-- Tabs -->
+    <div class="flex justify-center gap-4 mb-10">
+      <button onclick="showPanel('student')" class="px-10 py-4 rounded-3xl font-bold text-lg bg-teal-600 hover:bg-teal-700 transition">طالب علم</button>
+      <button onclick="showPanel('admin')" class="px-10 py-4 rounded-3xl font-bold text-lg bg-slate-700 hover:bg-slate-600 transition">ایڈمن پینل</button>
+    </div>
+
+    <!-- Student Panel -->
+    <div id="studentPanel">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="bg-slate-900/90 p-8 rounded-3xl shadow-2xl border border-teal-500/30">
+          <h2 class="text-2xl font-bold mb-6 text-teal-400">رجسٹریشن</h2>
+          <form id="studentForm" class="space-y-5">
+            <input type="text" id="name" placeholder="آپ کا مکمل نام" required class="w-full p-5 rounded-2xl bg-slate-800 border border-slate-600 focus:border-teal-400 outline-none text-lg">
+            <input type="tel" id="number" placeholder="واٹس ایپ نمبر (03XX-XXXXXXX)" required class="w-full p-5 rounded-2xl bg-slate-800 border border-slate-600 focus:border-teal-400 outline-none text-lg">
+            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 py-5 rounded-2xl font-bold text-xl">رجسٹر کریں</button>
+          </form>
+        </div>
+
+        <div class="bg-slate-900/90 p-8 rounded-3xl shadow-2xl border border-teal-500/30">
+          <h2 class="text-2xl font-bold mb-6 text-teal-400">حاضری لگائیں</h2>
+          <input type="date" id="attDate" class="w-full p-5 rounded-2xl bg-slate-800 border border-slate-600 mb-6">
+          <button onclick="markMyAttendance()" class="w-full bg-amber-500 hover:bg-amber-600 py-5 rounded-2xl font-bold text-xl">✅ میری حاضری لگائیں</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden">
+      <div class="bg-slate-900/90 rounded-3xl shadow-2xl p-8 border border-teal-500/30">
+        <h2 class="text-3xl font-bold mb-6 text-center text-teal-400">ایڈمن لاگ ان</h2>
+        <div id="loginForm" class="max-w-md mx-auto space-y-4">
+          <input type="password" id="adminPassword" placeholder="پاس ورڈ" class="w-full p-5 rounded-2xl bg-slate-800 border border-slate-600 text-center text-lg">
+          <button onclick="loginAdmin()" class="w-full bg-red-600 hover:bg-red-700 py-5 rounded-2xl font-bold text-xl">لاگ ان کریں</button>
+        </div>
+
+        <div id="adminDashboard" class="hidden">
+          <div class="flex justify-between items-center my-6">
+            <h2 class="text-3xl font-bold text-teal-400">تمام طلباء کی ریکارڈ</h2>
+            <button onclick="downloadExcel()" class="bg-teal-600 hover:bg-teal-700 px-8 py-4 rounded-2xl font-bold flex items-center gap-2">
+              <i class="fas fa-download"></i> Excel ڈاؤن لوڈ
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table id="recordsTable" class="w-full">
+              <thead><tr class="bg-slate-800">
+                <th class="p-4 text-right">نمبر</th>
+                <th class="p-4 text-right">نام</th>
+                <th class="p-4 text-right">واٹس ایپ نمبر</th>
+                <th class="p-4 text-center">کل حاضری</th>
+              </tr></thead>
+              <tbody id="tableBody" class="text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Weekly Ayats with Clear Urdu Translation
+    const ayats = [
+      { 
+        arabic: "وَقُلْ رَّبِّ زِدْنِي عِلْمًا", 
+        urdu: "اور کہو: اے میرے رب! میرے علم میں اضافہ فرما۔", 
+        ref: "سورۃ طہ (20:114)" 
+      },
+      { 
+        arabic: "يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ", 
+        urdu: "اللہ تم میں سے ایمان والوں اور علم دیئے گئے لوگوں کے درجات بلند کرتا ہے۔", 
+        ref: "سورۃ المجادلہ (58:11)" 
+      },
+      { 
+        arabic: "هَلْ يَسْتَوِي الَّذِينَ يَعْلَمُونَ وَالَّذِينَ لَا يَعْلَمُونَ", 
+        urdu: "کیا وہ لوگ برابر ہو سکتے ہیں جو علم رکھتے ہیں اور جو علم نہیں رکھتے؟", 
+        ref: "سورۃ الزمر (39:9)" 
+      },
+      { 
+        arabic: "فَاعْلَمْ أَنَّهُ لَا إِلَٰهَ إِلَّا اللَّهُ", 
+        urdu: "تو جان لو کہ اللہ کے سوا کوئی معبود نہیں۔", 
+        ref: "سورۃ محمد (47:19)" 
+      }
+    ];
+
+    function setWeeklyAyat() {
+      const weekNumber = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7)) % ayats.length;
+      const current = ayats[weekNumber];
+      
+      document.getElementById('ayatText').innerHTML = current.arabic;
+      document.getElementById('ayatUrdu').innerHTML = current.urdu;
+      document.getElementById('ayatRef').innerHTML = current.ref;
+    }
+
+    // Rest of the functionality
+    let students = [];
+    let isAdminLoggedIn = false;
+
+    function loadData() {
+      try { students = JSON.parse(localStorage.getItem('alburhan_students')) || []; } catch(e){}
+    }
+    function saveData() {
+      try { localStorage.setItem('alburhan_students', JSON.stringify(students)); } catch(e){}
+      if (isAdminLoggedIn) renderAdminTable();
+    }
+
+    function showPanel(panel) {
+      document.getElementById('studentPanel').classList.toggle('hidden', panel !== 'student');
+      document.getElementById('adminPanel').classList.toggle('hidden', panel !== 'admin');
+    }
+
+    function loginAdmin() {
+      if (document.getElementById('adminPassword').value === "Admin123#") {
+        isAdminLoggedIn = true;
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderAdminTable();
+      } else alert("❌ غلط پاس ورڈ! Admin123#");
+    }
+
+    document.getElementById('studentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const number = document.getElementById('number').value.trim();
+      if (!name || !number) return alert("تمام فیلڈز بھریں");
+      if (students.some(s => s.number === number)) return alert("یہ نمبر پہلے سے موجود ہے!");
+
+      students.push({id: Date.now(), name, number, attendance: {}});
+      saveData();
+      this.reset();
+      alert("✅ رجسٹریشن کامیاب!");
+    });
+
+    function markMyAttendance() {
+      const date = document.getElementById('attDate').value;
+      if (!date) return alert("تاریخ منتخب کریں!");
+      students.forEach(s => s.attendance[date] = true);
+      saveData();
+      alert(date + " کی حاضری لگا دی گئی!");
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      students.forEach((s, i) => {
+        const count = Object.keys(s.attendance || {}).length;
+        tbody.innerHTML += `<tr class="border-b border-slate-700 hover:bg-slate-800">
+          <td class="p-4 text-center">${i+1}</td>
+          <td class="p-4">${s.name}</td>
+          <td class="p-4">${s.number}</td>
+          <td class="p-4 text-center text-teal-400 font-bold">${count} دن</td>
+        </tr>`;
+      });
+    }
+
+    function downloadExcel() {
+      if (!students.length) return alert("کوئی ڈیٹا نہیں!");
+      let csv = "\uFEFFنمبر,نام,واٹس ایپ نمبر,کل حاضری\n";
+      students.forEach((s,i) => {
+        csv += `${i+1},"${s.name}","${s.number}",${Object.keys(s.attendance||{}).length}\n`;
+      });
+      const blob = new Blob([csv], {type: 'text/csv'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Alburhan_Attendance_${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+    }
+
+    // Initialize
+    loadData();
+    showPanel('student');
+    setWeeklyAyat();
+  </script>
+</body>
+</html>
