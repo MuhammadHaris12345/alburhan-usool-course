@@ -5,120 +5,637 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ALBURHAN AL USOOL COURSE</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    /* وہی پرانا سٹائل رکھا ہے، صرف ضروری تبدیلیاں کی ہیں */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #0d3330 50%, #0f172a 100%);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #164e63 100%);
       min-height: 100vh;
-      color: #f1f5f9;
+      color: white;
       direction: rtl;
     }
-    header { background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #10b981 100%); padding: 1.8rem 1rem 1.4rem; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
-    header h1 { font-size: 1.85rem; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; gap: .6rem; }
-    
-    .card { background: rgba(15,23,42,0.92); border: 1px solid rgba(45,212,191,0.18); border-radius: 1.2rem; padding: 1.6rem; margin-bottom: 1.1rem; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
-    .card h2 { color: #2dd4bf; margin-bottom: 1.1rem; }
-    .inp { width: 100%; padding: .9rem 1.1rem; border-radius: .8rem; background: #0f172a; border: 1.5px solid #1e293b; color: #f1f5f9; margin-bottom: .8rem; }
-    .inp:focus { border-color: #2dd4bf; box-shadow: 0 0 0 3px rgba(45,212,191,0.1); }
-    .btn { width:100%; padding:.9rem; border-radius:.8rem; border:none; font-weight:700; cursor:pointer; }
-    .btn-teal { background:linear-gradient(135deg,#0f766e,#0d9488); color:#fff; }
-    .btn-amber { background:linear-gradient(135deg,#b45309,#d97706); color:#fff; }
-    .btn-green { background:linear-gradient(135deg,#14532d,#16a34a); color:#fff; }
-    .msg { padding:.8rem 1.1rem; border-radius:.7rem; margin-bottom:.8rem; font-weight:600; display:none; }
-    .msg.success { background:rgba(16,185,129,0.12); border:1px solid #10b981; color:#6ee7b7; display:block; }
-    .msg.error { background:rgba(220,38,38,0.12); border:1px solid #dc2626; color:#fca5a5; display:block; }
-    .today-info { padding:.85rem 1.1rem; border-radius:.7rem; margin-bottom:.85rem; font-weight:600; text-align:center; }
-    .today-info.open { background:rgba(16,185,129,0.1); border:1px solid #10b981; color:#6ee7b7; }
-    .today-info.closed { background:rgba(251,191,36,0.1); border:1px solid #f59e0b; color:#fcd34d; }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0f766e, #10b981);
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      flex-wrap: wrap;
+      color: #fff;
+    }
+    header p { color: #99f6e4; margin-top: .4rem; font-size: 1.1rem; }
+
+    /* ── AYAT BOX ── */
+    .ayat-box {
+      background: linear-gradient(145deg, #fefce8, #fde047);
+      border: 4px solid #854d0e;
+      border-radius: 1.5rem;
+      max-width: 800px;
+      margin: 1.5rem auto;
+      padding: 2rem;
+      text-align: center;
+      color: #1c1917;
+      direction: rtl;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .arabic-text { font-size: 1.85rem; line-height: 2.8rem; font-family: serif; margin-bottom: .8rem; }
+    .urdu-text { font-size: 1.1rem; font-weight: 600; color: #065f46; margin-bottom: .4rem; }
+    .ref-text { font-size: .9rem; font-weight: 500; color: #92400e; }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: .75rem;
+      padding: 1.25rem 1rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: .75rem 2.5rem;
+      border-radius: 3rem;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+    }
+    .tab-btn.student { background: #0f766e; color: #fff; }
+    .tab-btn.admin   { background: #1e293b; color: #fff; border: 1px solid #334155; }
+    .tab-btn:hover   { transform: translateY(-2px); opacity: .88; }
+
+    /* ── PANELS ── */
+    .panel { display: none; max-width: 900px; margin: 0 auto; padding: 0 1rem 3rem; }
+    .panel.active { display: block; }
+
+    /* ── CARDS ── */
+    .card {
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(20,184,166,0.25);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+    }
+    .card h2 { color: #2dd4bf; font-size: 1.3rem; margin-bottom: 1.25rem; }
+
+    /* ── INPUTS ── */
+    .inp {
+      width: 100%;
+      padding: 1rem 1.1rem;
+      border-radius: 1rem;
+      background: #0f172a;
+      border: 1.5px solid #334155;
+      color: #f1f5f9;
+      font-size: 1rem;
+      outline: none;
+      margin-bottom: .85rem;
+      font-family: inherit;
+      direction: rtl;
+      transition: border .2s;
+    }
+    .inp:focus { border-color: #2dd4bf; }
+    .inp[readonly] { color: #94a3b8; cursor: default; opacity: .8; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 1rem;
+      border: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+      margin-top: .25rem;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); opacity: .88; }
+    .btn:active:not(:disabled) { transform: scale(.97); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-teal   { background: linear-gradient(135deg,#0f766e,#0d9488); color: #fff; }
+    .btn-amber  { background: linear-gradient(135deg,#b45309,#d97706); color: #fff; }
+    .btn-red    { background: linear-gradient(135deg,#991b1b,#dc2626); color: #fff; }
+    .btn-green  { background: linear-gradient(135deg,#14532d,#16a34a); color: #fff; }
+    .btn-sm { width: auto; padding: .5rem 1.1rem; font-size: .85rem; border-radius: .75rem; }
+
+    /* ── MESSAGES ── */
+    .msg { padding: .85rem 1rem; border-radius: .75rem; margin-bottom: .85rem; font-size: .92rem; font-weight: 600; display: none; }
+    .msg.success { background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #6ee7b7; display: block; }
+    .msg.error   { background: rgba(220,38,38,0.15);  border: 1px solid #dc2626; color: #fca5a5; display: block; }
+    .msg.info    { background: rgba(59,130,246,0.15);  border: 1px solid #3b82f6; color: #93c5fd; display: block; }
+
+    /* ── TODAY INFO ── */
+    .today-banner {
+      padding: .85rem 1rem; border-radius: .75rem; margin-bottom: .85rem;
+      font-size: .92rem; font-weight: 600; text-align: center;
+    }
+    .today-banner.open   { background: rgba(16,185,129,0.12); border: 1px solid #10b981; color: #6ee7b7; }
+    .today-banner.closed { background: rgba(251,191,36,0.12);  border: 1px solid #f59e0b; color: #fcd34d; }
+
+    /* ── STAT GRID ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: .85rem; margin-bottom: 1.25rem; }
+    .stat {
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(20,184,166,0.2);
+      border-radius: 1rem; padding: 1.1rem; text-align: center;
+    }
+    .stat-num   { font-size: 2rem; font-weight: 800; color: #2dd4bf; }
+    .stat-label { font-size: .75rem; color: #94a3b8; margin-top: .2rem; }
+
+    /* ── BAR CHART ── */
+    .bar-container { display: flex; flex-direction: column; gap: .65rem; }
+    .bar-row        { display: flex; align-items: center; gap: .85rem; }
+    .bar-label      { min-width: 120px; max-width: 140px; font-size: .82rem; color: #cbd5e1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track      { flex: 1; background: rgba(51,65,85,0.5); border-radius: 3rem; height: 26px; overflow: hidden; }
+    .bar-fill       { height: 100%; border-radius: 3rem; display: flex; align-items: center; justify-content: flex-end; padding-right: .6rem; transition: width 1s cubic-bezier(.4,0,.2,1); }
+    .bar-count      { font-size: .78rem; font-weight: 700; color: #fff; }
+
+    /* ── TWO COL ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+    @media(max-width:620px){ .two-col { grid-template-columns: 1fr; } }
+
+    /* ── DONUT ── */
+    .donut-wrap { display: flex; justify-content: center; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-top: .5rem; }
+    .legend { display: flex; flex-direction: column; gap: .5rem; }
+    .legend-item { display: flex; align-items: center; gap: .45rem; font-size: .83rem; color: #cbd5e1; }
+    .legend-dot  { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── DATE CHART ── */
+    .date-scroll { overflow-x: auto; padding-bottom: .4rem; }
+    .date-bars   { display: flex; align-items: flex-end; gap: .5rem; min-height: 110px; padding: .4rem 0; }
+    .date-col    { display: flex; flex-direction: column; align-items: center; gap: .25rem; min-width: 44px; }
+    .date-bar    { width: 36px; border-radius: .35rem .35rem 0 0; background: linear-gradient(to top,#0f766e,#2dd4bf); min-height: 5px; transition: height .8s; }
+    .date-num    { font-size: .72rem; color: #2dd4bf; font-weight: 700; }
+    .date-lbl    { font-size: .62rem; color: #94a3b8; text-align: center; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; min-width: 520px; }
+    th { background: #0f172a; padding: .85rem; text-align: right; color: #2dd4bf; border-bottom: 1px solid #334155; }
+    td { padding: .85rem; border-bottom: 1px solid rgba(51,65,85,0.4); color: #cbd5e1; vertical-align: top; }
+    tr:hover td { background: rgba(30,41,59,0.6); }
+    .badge { display: inline-block; padding: .22rem .5rem; border-radius: .3rem; font-size: .72rem; font-weight: 600; background: rgba(20,184,166,0.18); color: #2dd4bf; margin: .1rem; border: 1px solid rgba(20,184,166,0.2); }
+    .del-btn { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.3); color: #fca5a5; padding: .28rem .65rem; border-radius: .4rem; cursor: pointer; font-size: .78rem; font-family: inherit; }
+    .del-btn:hover { background: rgba(220,38,38,0.28); }
+    .admin-top { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; justify-content: space-between; }
+    .loading { text-align: center; padding: 2rem; color: #64748b; }
+    .my-record-box { background: rgba(16,185,129,0.1); border: 1px solid #10b981; border-radius: .85rem; padding: 1.1rem; margin-top: 1rem; }
+    .my-record-box p { color: #6ee7b7; margin-bottom: .4rem; line-height: 1.7; }
+
+    @media(max-width:600px){
+      header h1 { font-size: 1.35rem; }
+      .arabic-text { font-size: 1.35rem; line-height: 2.2rem; }
+      .card { padding: 1.25rem; }
+      .bar-label { min-width: 80px; max-width: 90px; }
+    }
   </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <header>
-  <h1><i class="fas fa-book-quran" style="color:#fcd34d"></i> ALBURHAN AL USOOL COURSE</h1>
-  <p>طلبِ علم کی سعادت — حاضری پورٹل</p>
+  <h1>
+    <i class="fas fa-book-quran" style="color:#fcd34d;font-size:1.8rem"></i>
+    ALBURHAN AL USOOL COURSE
+  </h1>
+  <p>طلبِ علم کی سعادت</p>
 </header>
 
-<div class="ayat-box" style="background: linear-gradient(145deg, #fefce8, #fef9c3); border: 2px solid #92400e; border-radius: 1.2rem; max-width: 750px; margin: 1.4rem auto; padding: 1.6rem; text-align: center; color: #1c1917;">
-  <div class="ayat-arabic" id="ayatArabic" style="font-size:1.75rem; line-height:2.6rem;"></div>
-  <div class="ayat-urdu" id="ayatUrdu" style="font-size:1rem; color:#065f46; font-weight:600;"></div>
-  <div class="ayat-ref" id="ayatRef" style="font-size:.82rem; color:#92400e; font-weight:600;"></div>
+<!-- AYAT -->
+<div class="ayat-box">
+  <p id="ayatArabic" class="arabic-text"></p>
+  <p id="ayatUrdu"   class="urdu-text"></p>
+  <p id="ayatRef"    class="ref-text"></p>
 </div>
 
+<!-- TABS -->
 <div class="tabs">
   <button class="tab-btn student" onclick="switchTab('student')">👨‍🎓 طالب علم</button>
-  <button class="tab-btn admin" onclick="switchTab('admin')">🔐 ایڈمن پینل</button>
+  <button class="tab-btn admin"   onclick="switchTab('admin')">🔐 ایڈمن پینل</button>
 </div>
 
-<!-- ===================== STUDENT PANEL ===================== -->
+<!-- ══════════ STUDENT PANEL ══════════ -->
 <div id="studentPanel" class="panel active">
 
-  <!-- Registration -->
   <div class="card">
-    <h2>📝 نئی رجسٹریشن</h2>
+    <h2><i class="fas fa-user-plus" style="color:#fcd34d"></i> نئی رجسٹریشن</h2>
     <div id="regMsg" class="msg"></div>
-    <input class="inp" id="regName" placeholder="آپ کا مکمل نام" type="text">
-    <input class="inp" id="regNum" placeholder="واٹس ایپ نمبر (03XXXXXXXXX)" type="tel">
+    <input class="inp" id="regName" type="text"  placeholder="آپ کا مکمل نام">
+    <input class="inp" id="regNum"  type="tel"   placeholder="واٹس ایپ نمبر (03XXXXXXXXX)">
     <button class="btn btn-teal" onclick="registerStudent()">✅ رجسٹر کریں</button>
   </div>
 
-  <!-- Mark Attendance (اب صرف ایک جگہ) -->
   <div class="card">
-    <h2>📅 آج کی حاضری لگائیں</h2>
-    <div id="todayInfo" class="today-info"></div>
+    <h2><i class="fas fa-calendar-check" style="color:#fcd34d"></i> آج کی حاضری لگائیں</h2>
+    <div id="todayBanner" class="today-banner"></div>
     <div id="attMsg" class="msg"></div>
-    
-    <input class="inp" id="attNum" placeholder="اپنا رجسٹرڈ واٹس ایپ نمبر" type="tel">
+    <input class="inp" id="attNum"         type="tel"  placeholder="اپنا رجسٹرڈ واٹس ایپ نمبر">
     <input class="inp" id="attDateDisplay" type="text" readonly>
-    
     <button class="btn btn-amber" id="attBtn" onclick="markAttendance()">✋ حاضری لگائیں</button>
   </div>
 
-  <!-- Check My Record -->
   <div class="card">
-    <h2>🔍 اپنی حاضری دیکھیں</h2>
+    <h2><i class="fas fa-magnifying-glass" style="color:#fcd34d"></i> اپنی حاضری دیکھیں</h2>
     <div id="checkMsg" class="msg"></div>
-    <input class="inp" id="checkNum" placeholder="اپنا واٹس ایپ نمبر" type="tel">
+    <input class="inp" id="checkNum" type="tel" placeholder="اپنا واٹس ایپ نمبر">
     <button class="btn btn-green" onclick="checkMyAttendance()">📊 ریکارڈ دیکھیں</button>
-    <div id="myRecord" style="display:none; margin-top:1rem;"></div>
+    <div id="myRecord" style="display:none"></div>
   </div>
+
 </div>
 
-<!-- Admin Panel (باقی وہی رہے گا، صرف data analysis بہتر کیا) -->
-<!-- ... (باقی کوڈ بہت لمبا ہے، نیچے اہم تبدیلیاں بتاتا ہوں) -->
+<!-- ══════════ ADMIN PANEL ══════════ -->
+<div id="adminPanel" class="panel">
 
+  <div class="card" id="loginCard">
+    <h2><i class="fas fa-lock" style="color:#fcd34d"></i> ایڈمن لاگ ان</h2>
+    <div id="loginMsg" class="msg"></div>
+    <input class="inp" id="adminPass" type="password" placeholder="پاس ورڈ درج کریں">
+    <button class="btn btn-red" onclick="adminLogin()">🔑 لاگ ان کریں</button>
+  </div>
+
+  <div id="dashboard" style="display:none">
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-num" id="statTotal">—</div><div class="stat-label">کل طلباء</div></div>
+      <div class="stat"><div class="stat-num" id="statAtt">—</div><div class="stat-label">کل حاضری</div></div>
+      <div class="stat"><div class="stat-num" id="statActive">—</div><div class="stat-label">فعال طلباء</div></div>
+      <div class="stat"><div class="stat-num" id="statAvg">—</div><div class="stat-label">اوسط فی طالب</div></div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="card">
+      <h2>📊 حاضری کے لحاظ سے طلباء</h2>
+      <div class="bar-container" id="barChart"></div>
+    </div>
+
+    <!-- Donut + Date chart -->
+    <div class="two-col">
+      <div class="card">
+        <h2>🍩 شرکت کا جائزہ</h2>
+        <div class="donut-wrap">
+          <svg width="130" height="130" viewBox="0 0 130 130" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,.35))">
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#1e293b" stroke-width="20"/>
+            <circle id="donutArc" cx="65" cy="65" r="50" fill="none" stroke="#10b981" stroke-width="20"
+              stroke-dasharray="0 314" stroke-linecap="round" transform="rotate(-90 65 65)"
+              style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"/>
+            <text x="65" y="60" text-anchor="middle" fill="#2dd4bf" font-size="18" font-weight="800" id="donutPct">0%</text>
+            <text x="65" y="76" text-anchor="middle" fill="#94a3b8" font-size="10">فعال</text>
+          </svg>
+          <div class="legend" id="donutLegend"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📅 سیشن کے مطابق حاضری</h2>
+        <div class="date-scroll">
+          <div class="date-bars" id="dateChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="admin-top">
+        <h2 style="margin:0">👥 تمام طلباء</h2>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-teal  btn-sm" onclick="loadAdminData()">🔄 ریفریش</button>
+          <button class="btn btn-green btn-sm" onclick="downloadCSV()">📥 Excel ڈاؤن لوڈ</button>
+        </div>
+      </div>
+      <div id="tableLoading" class="loading">⏳ ڈیٹا لوڈ ہو رہا ہے...</div>
+      <div class="table-wrap" id="tableWrap" style="display:none">
+        <table>
+          <thead><tr>
+            <th>#</th><th>نام</th><th>واٹس ایپ نمبر</th><th>کل حاضری</th><th>حاضری کی تاریخیں</th><th>حذف</th>
+          </tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /dashboard -->
+</div><!-- /adminPanel -->
+
+
+<!-- ══════════ FIREBASE + LOGIC ══════════ -->
 <script type="module">
-  // Firebase config وہی رکھیں
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, addDoc, updateDoc,
+    deleteDoc, doc, query, where
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const TODAY = new Date().toISOString().slice(0,10);
-  const isWeekend = [0,6].includes(new Date().getDay());
+  /* ── CONFIG ── */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBL1QpXUD-OiNcXKPjVG0xkGLqGL3E3L90",
+    authDomain:        "alburhan-course.firebaseapp.com",
+    projectId:         "alburhan-course",
+    storageBucket:     "alburhan-course.firebasestorage.app",
+    messagingSenderId: "240494620588",
+    appId:             "1:240494620588:web:1399c0dc333d530ca71409"
+  };
+  const db  = getFirestore(initializeApp(firebaseConfig));
+  const COL = collection(db, "students");
+  const ADMIN_PASS = "Admin123#";
 
-  // Today Info
-  document.getElementById('attDateDisplay').value = `${['اتوار','پیر','منگل','بدھ','جمعرات','جمعہ','ہفتہ'][new Date().getDay()]} — ${TODAY}`;
-  
-  const todayInfo = document.getElementById('todayInfo');
-  if (isWeekend) {
-    todayInfo.className = 'today-info open';
-    todayInfo.innerHTML = `✅ آج حاضری لگائی جا سکتی ہے — ${TODAY}`;
-  } else {
-    todayInfo.className = 'today-info closed';
-    todayInfo.innerHTML = '⚠️ حاضری صرف ہفتہ اور اتوار کو ہوتی ہے';
-    document.getElementById('attBtn').disabled = true;
+  /* ── AYAT ── */
+  const ayats = [
+    { arabic:"وَقُلْ رَّبِّ زِدْنِي عِلْمًا",
+      urdu:"اور کہو: اے میرے رب! میرے علم میں اضافہ فرما۔", ref:"سورۃ طہٰ – 20:114" },
+    { arabic:"يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ",
+      urdu:"اللہ تم میں سے ایمان والوں اور علم والوں کے درجات بلند کرتا ہے۔", ref:"سورۃ المجادلہ – 58:11" },
+    { arabic:"اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
+      urdu:"پڑھو اپنے رب کے نام سے جس نے پیدا کیا۔", ref:"سورۃ العلق – 96:1" },
+    { arabic:"إِنَّمَا يَخْشَى اللَّهَ مِنْ عِبَادِهِ الْعُلَمَاءُ",
+      urdu:"اللہ کے بندوں میں سے صرف علماء ہی اللہ سے ڈرتے ہیں۔", ref:"سورۃ فاطر – 35:28" }
+  ];
+  const aw = Math.floor(Date.now()/(1000*60*60*24*7)) % ayats.length;
+  document.getElementById('ayatArabic').textContent = ayats[aw].arabic;
+  document.getElementById('ayatUrdu').textContent   = ayats[aw].urdu;
+  document.getElementById('ayatRef').textContent    = ayats[aw].ref;
+
+  /* ── DATE UTILS ── */
+  function todayISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function isWeekend(iso) {
+    const day = new Date(iso + 'T00:00:00').getDay();
+    return day === 6 || day === 0;
+  }
+  function urduDayLabel(iso) {
+    const names = ['اتوار','پیر','منگل','بدھ','جمعرات','جمعہ','ہفتہ'];
+    return names[new Date(iso+'T00:00:00').getDay()] + ' — ' + iso;
   }
 
-  // Registration کے بعد نمبر auto fill کر دو
-  window.registerStudent = async () => {
-    // ... پرانا کوڈ ...
-    // آخر میں یہ لائن ضرور ڈالیں:
-    if (!snap.empty) return;
-    // successful registration کے بعد
-    document.getElementById('attNum').value = num;
-    showMsg('regMsg', `✅ رجسٹریشن کامیاب! ${name} — اب نیچے حاضری لگائیں`, 'success');
+  /* ── NORMALIZE dates from Firestore doc ── */
+  function normDates(data) {
+    if (Array.isArray(data.attendanceDates) && data.attendanceDates.length)
+      return [...data.attendanceDates].sort();
+    if (data.attendance && typeof data.attendance === 'object') {
+      return Object.entries(data.attendance)
+        .filter(([,v]) => v === true)
+        .map(([k]) => k).sort();
+    }
+    return [];
+  }
+
+  /* ── SETUP TODAY ── */
+  const TODAY   = todayISO();
+  const WEEKEND = isWeekend(TODAY);
+  document.getElementById('attDateDisplay').value = urduDayLabel(TODAY);
+  const banner = document.getElementById('todayBanner');
+  const attBtn = document.getElementById('attBtn');
+  if (WEEKEND) {
+    banner.className = 'today-banner open';
+    banner.textContent = '✅ آج حاضری لگائی جا سکتی ہے — ' + urduDayLabel(TODAY);
+  } else {
+    banner.className = 'today-banner closed';
+    banner.textContent = '⚠️ آج ہفتہ یا اتوار نہیں — حاضری صرف ہفتہ اور اتوار کو ہوتی ہے';
+    attBtn.disabled = true;
+  }
+
+  /* ── HELPERS ── */
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+    setTimeout(() => { el.className='msg'; el.textContent=''; }, 5500);
+  }
+
+  window.switchTab = t => {
+    document.getElementById('studentPanel').className = 'panel' + (t==='student'?' active':'');
+    document.getElementById('adminPanel').className   = 'panel' + (t==='admin'  ?' active':'');
   };
 
-  // باقی functions (markAttendance, checkMyAttendance وغیرہ) وہی رکھیں، صرف duplicate check مضبوط کیا ہے۔
+  /* ── REGISTER ── */
+  window.registerStudent = async () => {
+    const name = document.getElementById('regName').value.trim();
+    const num  = document.getElementById('regNum').value.trim();
+    if (!name || !num)          { showMsg('regMsg','❌ نام اور نمبر دونوں لازمی ہیں','error'); return; }
+    if (!/^03\d{9}$/.test(num)) { showMsg('regMsg','❌ درست فارمیٹ: 03XXXXXXXXX','error'); return; }
+    showMsg('regMsg','⏳ رجسٹریشن ہو رہی ہے...','info');
+    try {
+      const snap = await getDocs(query(COL, where("number","==",num)));
+      if (!snap.empty) { showMsg('regMsg','❌ یہ نمبر پہلے سے رجسٹرڈ ہے!','error'); return; }
+      await addDoc(COL, { name, number:num, attendanceDates:[], createdAt:Date.now() });
+      showMsg('regMsg','✅ رجسٹریشن کامیاب! خوش آمدید ' + name,'success');
+      document.getElementById('regName').value = '';
+      document.getElementById('regNum').value  = '';
+    } catch(e) { showMsg('regMsg','❌ '+e.message,'error'); }
+  };
+
+  /* ── MARK ATTENDANCE (today only) ── */
+  window.markAttendance = async () => {
+    const num = document.getElementById('attNum').value.trim();
+    if (!num)     { showMsg('attMsg','❌ واٹس ایپ نمبر درج کریں','error'); return; }
+    if (!WEEKEND) { showMsg('attMsg','❌ آج حاضری کا دن نہیں!','error'); return; }
+    showMsg('attMsg','⏳ حاضری لگ رہی ہے...','info');
+    try {
+      const snap = await getDocs(query(COL, where("number","==",num)));
+      if (snap.empty) { showMsg('attMsg','❌ یہ نمبر رجسٹرڈ نہیں ہے!','error'); return; }
+      const ref  = snap.docs[0];
+      const data = ref.data();
+      let dates  = normDates(data);
+      if (dates.includes(TODAY)) { showMsg('attMsg','⚠️ آج کی حاضری پہلے ہی لگ چکی ہے!','error'); return; }
+      dates.push(TODAY); dates.sort();
+      await updateDoc(doc(db,"students",ref.id), { attendanceDates:dates });
+      showMsg('attMsg','✅ حاضری کامیاب! ('+data.name+') — '+TODAY,'success');
+    } catch(e) { showMsg('attMsg','❌ '+e.message,'error'); }
+  };
+
+  /* ── CHECK MY ATTENDANCE ── */
+  window.checkMyAttendance = async () => {
+    const num = document.getElementById('checkNum').value.trim();
+    if (!num) { showMsg('checkMsg','❌ نمبر درج کریں','error'); return; }
+    showMsg('checkMsg','⏳ ریکارڈ ڈھونڈ رہے ہیں...','info');
+    try {
+      const snap = await getDocs(query(COL, where("number","==",num)));
+      if (snap.empty) {
+        showMsg('checkMsg','❌ یہ نمبر رجسٹرڈ نہیں','error');
+        document.getElementById('myRecord').style.display='none'; return;
+      }
+      const data  = snap.docs[0].data();
+      const dates = normDates(data);
+      const box   = document.getElementById('myRecord');
+      box.style.display = 'block';
+      box.innerHTML = `<div class="my-record-box">
+        <p><strong>نام:</strong> ${data.name}</p>
+        <p><strong>نمبر:</strong> <span style="direction:ltr;display:inline-block">${data.number}</span></p>
+        <p style="color:#fcd34d;font-size:1.1rem;margin:.5rem 0"><strong>کل حاضری: ${dates.length} دن</strong></p>
+        <div style="margin-top:.5rem">
+          ${dates.length
+            ? dates.map(d=>`<span class="badge">${d}</span>`).join('')
+            : '<span style="color:#94a3b8">ابھی تک کوئی حاضری نہیں</span>'}
+        </div>
+      </div>`;
+      showMsg('checkMsg','✅ ریکارڈ مل گیا','success');
+    } catch(e) { showMsg('checkMsg','❌ '+e.message,'error'); }
+  };
+
+  /* ── ADMIN LOGIN ── */
+  window.adminLogin = () => {
+    if (document.getElementById('adminPass').value === ADMIN_PASS) {
+      document.getElementById('loginCard').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadAdminData();
+    } else { showMsg('loginMsg','❌ غلط پاس ورڈ!','error'); }
+  };
+  document.getElementById('adminPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.adminLogin();
+  });
+
+  /* ── LOAD ALL DATA ── */
+  let allStudents = [];
+  window.loadAdminData = async () => {
+    document.getElementById('tableLoading').style.display = 'block';
+    document.getElementById('tableWrap').style.display    = 'none';
+    try {
+      const snap  = await getDocs(COL);
+      allStudents = snap.docs.map(d => ({
+        id: d.id, ...d.data(),
+        dates: normDates(d.data())
+      }));
+      allStudents.sort((a,b) => (a.createdAt||0)-(b.createdAt||0));
+      renderStats();
+      renderTable();
+      renderBarChart();
+      renderDonut();
+      renderDateChart();
+    } catch(e) {
+      document.getElementById('tableLoading').textContent = '❌ ڈیٹا لوڈ نہیں ہوا: '+e.message;
+    }
+  };
+
+  function renderStats() {
+    const total    = allStudents.length;
+    const totalAtt = allStudents.reduce((a,s)=>a+s.dates.length,0);
+    const active   = allStudents.filter(s=>s.dates.length>0).length;
+    const avg      = total ? (totalAtt/total).toFixed(1) : 0;
+    document.getElementById('statTotal').textContent  = total;
+    document.getElementById('statAtt').textContent    = totalAtt;
+    document.getElementById('statActive').textContent = active;
+    document.getElementById('statAvg').textContent    = avg;
+  }
+
+  function renderBarChart() {
+    const el = document.getElementById('barChart');
+    el.innerHTML = '';
+    if (!allStudents.length) { el.innerHTML='<p style="color:#475569;text-align:center;padding:1rem">کوئی ڈیٹا نہیں</p>'; return; }
+    const sorted = [...allStudents].sort((a,b)=>b.dates.length-a.dates.length).slice(0,12);
+    const max    = sorted[0]?.dates.length || 1;
+    const colors = [
+      'linear-gradient(90deg,#0f766e,#2dd4bf)',
+      'linear-gradient(90deg,#0369a1,#38bdf8)',
+      'linear-gradient(90deg,#7c3aed,#a78bfa)',
+      'linear-gradient(90deg,#b45309,#fcd34d)',
+      'linear-gradient(90deg,#be123c,#fb7185)',
+      'linear-gradient(90deg,#065f46,#34d399)',
+    ];
+    sorted.forEach((s,i) => {
+      const pct = (s.dates.length/max)*100 || 0;
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = `
+        <div class="bar-label" title="${s.name}">${s.name}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${Math.max(pct,4)}%;background:${colors[i%colors.length]}">
+            <span class="bar-count">${s.dates.length}</span>
+          </div>
+        </div>`;
+      el.appendChild(row);
+    });
+  }
+
+  function renderDonut() {
+    const total  = allStudents.length;
+    const active = allStudents.filter(s=>s.dates.length>0).length;
+    const pct    = total ? Math.round((active/total)*100) : 0;
+    const circ   = 2 * Math.PI * 50;
+    const fill   = total ? (active/total)*circ : 0;
+    document.getElementById('donutPct').textContent = pct + '%';
+    document.getElementById('donutArc').setAttribute('stroke-dasharray', `${fill} ${circ}`);
+    document.getElementById('donutLegend').innerHTML = `
+      <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> فعال: ${active}</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1e293b;border:1px solid #475569"></div> غیر فعال: ${total-active}</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2dd4bf"></div> کل: ${total}</div>`;
+  }
+
+  function renderDateChart() {
+    const el = document.getElementById('dateChart');
+    el.innerHTML = '';
+    const counts = {};
+    allStudents.forEach(s => s.dates.forEach(d => { counts[d]=(counts[d]||0)+1; }));
+    const entries = Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0]));
+    if (!entries.length) { el.innerHTML='<p style="color:#475569;font-size:.82rem;padding:.5rem">ابھی کوئی حاضری نہیں</p>'; return; }
+    const maxV = Math.max(...entries.map(e=>e[1]));
+    entries.forEach(([date,cnt]) => {
+      const h   = Math.max((cnt/maxV)*88, 6);
+      const col = document.createElement('div');
+      col.className = 'date-col';
+      col.innerHTML = `
+        <div class="date-num">${cnt}</div>
+        <div class="date-bar" style="height:${h}px"></div>
+        <div class="date-lbl">${date.slice(5)}</div>`;
+      el.appendChild(col);
+    });
+  }
+
+  function renderTable() {
+    document.getElementById('tableLoading').style.display = 'none';
+    document.getElementById('tableWrap').style.display    = 'block';
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    if (!allStudents.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#475569;padding:2rem">ابھی کوئی طالب علم رجسٹرڈ نہیں</td></tr>';
+      return;
+    }
+    allStudents.forEach((s,i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${s.name}</td>
+        <td style="direction:ltr;text-align:right">${s.number}</td>
+        <td style="text-align:center;color:#2dd4bf;font-weight:800;font-size:1.1rem">${s.dates.length}</td>
+        <td>${s.dates.map(d=>`<span class="badge">${d}</span>`).join('') || '<span style="color:#475569">—</span>'}</td>
+        <td><button class="del-btn" onclick="deleteStudent('${s.id}','${s.name}')">🗑 حذف</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── DELETE ── */
+  window.deleteStudent = async (id, name) => {
+    if (!confirm(`کیا آپ واقعی "${name}" کو حذف کرنا چاہتے ہیں؟\nیہ عمل واپس نہیں ہو گا!`)) return;
+    try { await deleteDoc(doc(db,"students",id)); await loadAdminData(); }
+    catch(e) { alert('حذف نہیں ہوا: '+e.message); }
+  };
+
+  /* ── DOWNLOAD CSV ── */
+  window.downloadCSV = () => {
+    if (!allStudents.length) { alert('کوئی ڈیٹا نہیں!'); return; }
+    let csv = "\uFEFFنمبر شمار,نام,واٹس ایپ نمبر,کل حاضری,حاضری کی تاریخیں\n";
+    allStudents.forEach((s,i) => {
+      csv += `${i+1},"${s.name}","${s.number}",${s.dates.length},"${s.dates.join(' | ')}"\n`;
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download = `Alburhan_Attendance_${TODAY}.csv`;
+    a.click();
+  };
+
 </script>
 </body>
 </html>
