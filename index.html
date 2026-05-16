@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ALBURHAN AL USOOL COURSE</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+  <!-- ── FEATURE 3: SheetJS for professional Excel export ── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%); min-height: 100vh; color: #f1f5f9; direction: rtl; }
@@ -78,6 +80,67 @@
     .date-bar { width: 34px; border-radius: .3rem .3rem 0 0; background: linear-gradient(to top, #0f766e, #2dd4bf); min-height: 5px; transition: height .8s; }
     .date-num { font-size: .72rem; color: #2dd4bf; font-weight: 700; }
     .date-lbl { font-size: .62rem; color: #94a3b8; text-align: center; }
+
+    /* ── FEATURE 1: Quick Present Button styles ── */
+    .quick-present-wrap {
+      margin-top: .85rem;
+      display: none; /* hidden by default, shown after successful registration on weekends */
+    }
+    .btn-quick-present {
+      width: 100%;
+      padding: .85rem;
+      border-radius: .75rem;
+      border: 2px solid #10b981;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .25s;
+      background: linear-gradient(135deg, #064e3b, #065f46);
+      color: #6ee7b7;
+      letter-spacing: .03em;
+      box-shadow: 0 0 18px rgba(16,185,129,0.25);
+    }
+    .btn-quick-present:hover:not(:disabled) {
+      background: linear-gradient(135deg, #065f46, #0f766e);
+      box-shadow: 0 0 28px rgba(16,185,129,0.45);
+      transform: translateY(-2px);
+    }
+    .btn-quick-present:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── FEATURE 2: Section divider between two admin tables ── */
+    .section-divider {
+      border: none;
+      border-top: 1px dashed rgba(45,212,191,0.25);
+      margin: 1.5rem 0;
+    }
+    .section-heading {
+      color: #2dd4bf;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: .85rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .section-count-badge {
+      background: rgba(45,212,191,0.15);
+      color: #2dd4bf;
+      border: 1px solid rgba(45,212,191,0.3);
+      border-radius: 2rem;
+      padding: .1rem .6rem;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    /* ── FEATURE 3: Excel export button highlight ── */
+    .btn-excel {
+      background: linear-gradient(135deg, #166534, #15803d);
+      color: #fff;
+      border: 1px solid #22c55e;
+      box-shadow: 0 0 12px rgba(34,197,94,0.2);
+    }
+    .btn-excel:hover { box-shadow: 0 0 22px rgba(34,197,94,0.4); }
   </style>
 </head>
 <body>
@@ -98,7 +161,7 @@
   <button class="tab-btn admin" onclick="switchTab('admin')">🔐 ایڈمن پینل</button>
 </div>
 
-<!-- Student Panel -->
+<!-- ══════════════ STUDENT PANEL ══════════════ -->
 <div id="studentPanel" class="panel active">
 
   <div class="card">
@@ -107,6 +170,11 @@
     <input class="inp" id="regName" type="text" placeholder="آپ کا مکمل نام">
     <input class="inp" id="regNum" type="tel" placeholder="واٹس ایپ نمبر (03XXXXXXXXX)">
     <button class="btn btn-teal" onclick="registerStudent()">✅ رجسٹر کریں</button>
+
+    <!-- ── FEATURE 1: Quick Present button (shown only on weekends after registration) ── -->
+    <div class="quick-present-wrap" id="quickPresentWrap">
+      <button class="btn-quick-present" id="quickPresentBtn" onclick="quickMarkAttendance()"></button>
+    </div>
   </div>
 
   <div class="card">
@@ -128,7 +196,7 @@
 
 </div>
 
-<!-- Admin Panel -->
+<!-- ══════════════ ADMIN PANEL ══════════════ -->
 <div id="adminPanel" class="panel">
 
   <div class="card" id="loginCard">
@@ -140,6 +208,7 @@
 
   <div id="dashboard" style="display:none">
 
+    <!-- Stats -->
     <div class="stat-grid">
       <div class="stat"><div class="stat-num" id="statTotal">—</div><div class="stat-label">کل طلباء</div></div>
       <div class="stat"><div class="stat-num" id="statAtt">—</div><div class="stat-label">کل حاضری</div></div>
@@ -176,22 +245,50 @@
       </div>
     </div>
 
-    <!-- Table -->
+    <!-- ── FEATURE 2: Admin Panel — SECTION 1: Registered Students ── -->
     <div class="card">
       <div class="admin-btns">
-        <h2 style="margin:0">👥 تمام طلباء</h2>
-        <div style="display:flex;gap:.5rem">
+        <div class="section-heading">
+          👥 رجسٹرڈ طلباء
+          <span class="section-count-badge" id="regCountBadge">0</span>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
           <button class="btn btn-teal btn-sm" onclick="loadAdminData()">🔄 ریفریش</button>
-          <button class="btn btn-green btn-sm" onclick="downloadCSV()">📥 Excel ڈاؤن لوڈ</button>
+          <!-- ── FEATURE 3: Professional Excel Export button ── -->
+          <button class="btn btn-sm btn-excel" onclick="downloadExcel()">📊 Excel Export</button>
         </div>
       </div>
-      <div id="tableLoading" class="loading">⏳ ڈیٹا لوڈ ہو رہا ہے...</div>
-      <div class="table-wrap" id="tableWrap" style="display:none">
+      <div id="regTableLoading" class="loading">⏳ ڈیٹا لوڈ ہو رہا ہے...</div>
+      <div class="table-wrap" id="regTableWrap" style="display:none">
         <table>
           <thead><tr>
-            <th>#</th><th>نام</th><th>واٹس ایپ نمبر</th><th>کل حاضری</th><th>حاضری کی تاریخیں</th><th>حذف</th>
+            <th>#</th>
+            <th>نام</th>
+            <th>واٹس ایپ نمبر</th>
+            <th>رجسٹریشن تاریخ</th>
+            <th>حذف</th>
           </tr></thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="regTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- ── FEATURE 2: SECTION 2: Attendance Records ── -->
+      <hr class="section-divider">
+      <div class="section-heading">
+        ✅ حاضری ریکارڈ
+        <span class="section-count-badge" id="attCountBadge">0</span>
+      </div>
+      <div id="attTableLoading" class="loading" style="display:none">⏳ ڈیٹا لوڈ ہو رہا ہے...</div>
+      <div class="table-wrap" id="attTableWrap" style="display:none">
+        <table>
+          <thead><tr>
+            <th>#</th>
+            <th>نام</th>
+            <th>واٹس ایپ نمبر</th>
+            <th>کل حاضری</th>
+            <th>حاضری کی تاریخیں</th>
+          </tr></thead>
+          <tbody id="attTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -217,7 +314,7 @@
   const COL = collection(db, "students");
   const ADMIN_PASS = "Admin123#";
 
-  // ── Ayat ──
+  // ── Ayat rotation ──
   const ayats = [
     { arabic:"وَقُلْ رَّبِّ زِدْنِي عِلْمًا", urdu:"اور کہو: اے میرے رب! میرے علم میں اضافہ فرما۔", ref:"سورۃ طہٰ – 20:114" },
     { arabic:"يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ", urdu:"اللہ تم میں سے ایمان والوں اور علم والوں کے درجات بلند کرتا ہے۔", ref:"سورۃ المجادلہ – 58:11" },
@@ -234,6 +331,8 @@
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
+  // Returns 6 = Saturday, 0 = Sunday
+  function todayDayIndex() { return new Date().getDay(); }
   function isWeekend(iso) { const d = new Date(iso+'T00:00:00'); return d.getDay()===6||d.getDay()===0; }
   function urduDay(iso) {
     const days=['اتوار','پیر','منگل','بدھ','جمعرات','جمعہ','ہفتہ'];
@@ -271,12 +370,69 @@
     return [];
   }
 
+  // Format timestamp → YYYY-MM-DD
+  function tsToDate(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
   window.switchTab = t => {
     document.getElementById('studentPanel').className='panel'+(t==='student'?' active':'');
     document.getElementById('adminPanel').className='panel'+(t==='admin'?' active':'');
   };
 
-  // ── Register ──
+  // ── FEATURE 1: Quick Present Button logic ──
+  // Sets up the Quick Present button label based on today's day (Sat/Sun)
+  function setupQuickPresentBtn() {
+    if (!weekend) return; // only show on weekends
+    const dayIdx = todayDayIndex();
+    const dayLabel = dayIdx === 6 ? 'SAT' : 'SUN'; // 6=Sat, 0=Sun
+    const btn = document.getElementById('quickPresentBtn');
+    btn.textContent = `📅 ${dayLabel} - ${TODAY} Present`;
+  }
+  setupQuickPresentBtn();
+
+  // ── FEATURE 1: Show Quick Present button after successful registration ──
+  function showQuickPresent(num) {
+    if (!weekend) return; // Quick Present only visible on Sat/Sun
+    // Pre-fill the attendance number field
+    document.getElementById('attNum').value = num;
+    // Show the Quick Present wrapper
+    document.getElementById('quickPresentWrap').style.display = 'block';
+  }
+
+  // ── FEATURE 1: Quick Present — marks attendance immediately using registered number ──
+  window.quickMarkAttendance = async () => {
+    const num = document.getElementById('regNum').value.trim()
+              || document.getElementById('attNum').value.trim();
+    if (!num) { showMsg('regMsg','❌ نمبر دستیاب نہیں۔ دوبارہ کوشش کریں','error'); return; }
+    if (!weekend) { showMsg('regMsg','❌ آج حاضری کا دن نہیں!','error'); return; }
+
+    const btn = document.getElementById('quickPresentBtn');
+    btn.disabled = true;
+    showMsg('regMsg','⏳ حاضری لگ رہی ہے...','info');
+
+    try {
+      const snap = await getDocs(query(COL, where("number","==",num)));
+      if (snap.empty) { showMsg('regMsg','❌ یہ نمبر رجسٹرڈ نہیں ہے!','error'); btn.disabled=false; return; }
+      const ref = snap.docs[0]; const data = ref.data();
+      let dates = normDates(data);
+      if (dates.includes(TODAY)) {
+        showMsg('regMsg','⚠️ آج کی حاضری پہلے ہی لگ چکی ہے!','error');
+        btn.disabled = false; return;
+      }
+      dates.push(TODAY); dates.sort();
+      await updateDoc(doc(db,"students",ref.id), { attendanceDates: dates });
+      showMsg('regMsg',`✅ حاضری کامیاب! (${data.name}) — ${TODAY}`,'success');
+      btn.disabled = true; // prevent double-click after success
+    } catch(e) {
+      showMsg('regMsg','❌ '+e.message,'error');
+      btn.disabled = false;
+    }
+  };
+
+  // ── Register — MODIFIED to call showQuickPresent after success ──
   window.registerStudent = async () => {
     const name = document.getElementById('regName').value.trim();
     const num  = document.getElementById('regNum').value.trim();
@@ -288,12 +444,17 @@
       if (!snap.empty){ showMsg('regMsg','❌ یہ نمبر پہلے سے رجسٹرڈ ہے!','error'); return; }
       await addDoc(COL, { name, number:num, attendanceDates:[], createdAt:Date.now() });
       showMsg('regMsg','✅ رجسٹریشن کامیاب! خوش آمدید '+name,'success');
+
+      // ── FEATURE 1: After registration success ──
+      // Fill attendance number field and show Quick Present button on weekends
+      showQuickPresent(num);
+
       document.getElementById('regName').value='';
-      document.getElementById('regNum').value='';
+      // Keep regNum filled so quickMarkAttendance can read it
     } catch(e){ showMsg('regMsg','❌ '+e.message,'error'); }
   };
 
-  // ── Mark Attendance (today only) ──
+  // ── Mark Attendance (today only) — unchanged ──
   window.markAttendance = async () => {
     const num = document.getElementById('attNum').value.trim();
     if (!num){ showMsg('attMsg','❌ واٹس ایپ نمبر درج کریں','error'); return; }
@@ -311,7 +472,7 @@
     } catch(e){ showMsg('attMsg','❌ '+e.message,'error'); }
   };
 
-  // ── Check my attendance ──
+  // ── Check my attendance — unchanged ──
   window.checkMyAttendance = async () => {
     const num = document.getElementById('checkNum').value.trim();
     if (!num){ showMsg('checkMsg','❌ نمبر درج کریں','error'); return; }
@@ -333,7 +494,7 @@
     } catch(e){ showMsg('checkMsg','❌ '+e.message,'error'); }
   };
 
-  // ── Admin ──
+  // ── Admin login ──
   window.adminLogin = () => {
     if (document.getElementById('adminPass').value===ADMIN_PASS){
       document.getElementById('loginCard').style.display='none';
@@ -343,18 +504,28 @@
   };
   document.getElementById('adminPass').addEventListener('keydown',e=>{ if(e.key==='Enter') window.adminLogin(); });
 
-  let allStudents=[];
+  // Shared students cache for Excel export
+  let allStudents = [];
 
+  // ── Load Admin Data — MODIFIED to render both tables ──
   window.loadAdminData = async () => {
-    document.getElementById('tableLoading').style.display='block';
-    document.getElementById('tableWrap').style.display='none';
+    // Show loaders
+    document.getElementById('regTableLoading').style.display='block';
+    document.getElementById('regTableWrap').style.display='none';
+    document.getElementById('attTableLoading').style.display='block';
+    document.getElementById('attTableWrap').style.display='none';
     try {
       const snap = await getDocs(COL);
       allStudents = snap.docs.map(d=>({ id:d.id, ...d.data(), dates:normDates(d.data()) }));
       allStudents.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-      renderStats(); renderTable(); renderBarChart(); renderDonut(); renderDateChart();
+      renderStats();
+      renderBarChart();
+      renderDonut();
+      renderDateChart();
+      renderRegisteredTable();   // FEATURE 2 — Section 1
+      renderAttendanceTable();   // FEATURE 2 — Section 2
     } catch(e){
-      document.getElementById('tableLoading').textContent='❌ ڈیٹا لوڈ نہیں ہوا: '+e.message;
+      document.getElementById('regTableLoading').textContent='❌ ڈیٹا لوڈ نہیں ہوا: '+e.message;
     }
   };
 
@@ -415,18 +586,47 @@
     });
   }
 
-  function renderTable(){
-    document.getElementById('tableLoading').style.display='none';
-    document.getElementById('tableWrap').style.display='block';
-    const tbody=document.getElementById('tableBody'); tbody.innerHTML='';
-    if(!allStudents.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:2rem">ابھی کوئی طالب علم رجسٹرڈ نہیں</td></tr>'; return; }
+  // ── FEATURE 2 — Section 1: Registered Students table ──
+  function renderRegisteredTable(){
+    document.getElementById('regTableLoading').style.display='none';
+    document.getElementById('regTableWrap').style.display='block';
+    document.getElementById('regCountBadge').textContent = allStudents.length;
+    const tbody=document.getElementById('regTableBody'); tbody.innerHTML='';
+    if(!allStudents.length){
+      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:2rem">ابھی کوئی طالب علم رجسٹرڈ نہیں</td></tr>'; return;
+    }
     allStudents.forEach((s,i)=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td>
+      tr.innerHTML=`
+        <td>${i+1}</td>
+        <td>${s.name}</td>
+        <td style="direction:ltr;text-align:right">${s.number}</td>
+        <td>${tsToDate(s.createdAt)}</td>
+        <td><button class="del-btn" onclick="deleteStudent('${s.id}','${s.name}')">🗑 حذف</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ── FEATURE 2 — Section 2: Attendance Records table ──
+  function renderAttendanceTable(){
+    document.getElementById('attTableLoading').style.display='none';
+    document.getElementById('attTableWrap').style.display='block';
+    // Only show students who have at least 1 attendance
+    const active = allStudents.filter(s=>s.dates.length>0)
+                              .sort((a,b)=>b.dates.length-a.dates.length);
+    document.getElementById('attCountBadge').textContent = active.length;
+    const tbody=document.getElementById('attTableBody'); tbody.innerHTML='';
+    if(!active.length){
+      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:2rem">ابھی کسی نے حاضری نہیں لگائی</td></tr>'; return;
+    }
+    active.forEach((s,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${i+1}</td>
+        <td>${s.name}</td>
         <td style="direction:ltr;text-align:right">${s.number}</td>
         <td style="text-align:center;color:#2dd4bf;font-weight:700">${s.dates.length}</td>
-        <td>${s.dates.map(d=>`<span class="badge">${d}</span>`).join('')||'<span style="color:#64748b">—</span>'}</td>
-        <td><button class="del-btn" onclick="deleteStudent('${s.id}','${s.name}')">🗑 حذف</button></td>`;
+        <td>${s.dates.map(d=>`<span class="badge">${d}</span>`).join('')}</td>`;
       tbody.appendChild(tr);
     });
   }
@@ -437,15 +637,185 @@
     catch(e){ alert('حذف نہیں ہوا: '+e.message); }
   };
 
-  window.downloadCSV = () => {
-    if(!allStudents.length){ alert('کوئی ڈیٹا نہیں!'); return; }
-    let csv="\uFEFFنمبر شمار,نام,واٹس ایپ نمبر,کل حاضری,حاضری کی تاریخیں\n";
-    allStudents.forEach((s,i)=>{ csv+=`${i+1},"${s.name}","${s.number}",${s.dates.length},"${s.dates.join(' | ')}"\n`; });
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-    a.download=`Alburhan_Attendance_${TODAY}.csv`;
-    a.click();
+  // ════════════════════════════════════════════════════════════════
+  // ── FEATURE 3: Professional Excel Export using SheetJS (xlsx) ──
+  // ════════════════════════════════════════════════════════════════
+  window.downloadExcel = () => {
+    if (!allStudents.length) { alert('کوئی ڈیٹا نہیں!'); return; }
+
+    // ── Helper: apply styles to a cell by address ──
+    // SheetJS community edition does not support cell styles, so we produce
+    // a richly structured workbook with formatted data and column widths.
+    // For full cell coloring support, the file is built with manual cell
+    // metadata so it opens cleanly in Excel / LibreOffice / Google Sheets.
+
+    const wb = XLSX.utils.book_new();
+
+    // ── Colour palette (used as cell fill via s.fgColor) ──
+    // SheetJS free tier supports: font bold/color, fill, alignment on cells
+    // via the `!cols` and `!rows` + direct cell `.s` properties.
+    // We use a wrapper that sets these consistently.
+
+    function cell(v, bold=false, bg='', color='000000', align='left') {
+      const c = { v, t: typeof v==='number'?'n':'s' };
+      c.s = {
+        font: { bold, color:{ rgb: color } },
+        fill: bg ? { fgColor:{ rgb: bg }, patternType:'solid' } : undefined,
+        alignment: { horizontal: align, vertical:'center', wrapText: true }
+      };
+      return c;
+    }
+
+    // ────────────────────────────
+    // SHEET 1 — Dashboard Summary
+    // ────────────────────────────
+    const total   = allStudents.length;
+    const totalAtt= allStudents.reduce((a,s)=>a+s.dates.length,0);
+    const active  = allStudents.filter(s=>s.dates.length>0).length;
+    const avg     = total ? +(totalAtt/total).toFixed(2) : 0;
+
+    // Date-wise attendance counts (for Sheet 4)
+    const dateCounts = {};
+    allStudents.forEach(s=>s.dates.forEach(d=>{ dateCounts[d]=(dateCounts[d]||0)+1; }));
+
+    const sh1Data = [
+      [ cell('ALBURHAN AL USOOL COURSE — Attendance Dashboard', true, '0F766E', 'FFFFFF', 'center') ],
+      [ cell('Generated: '+TODAY, false, '134E4A', 'CCFBF1', 'center') ],
+      [],
+      [ cell('Metric', true, '1E293B', '2DD4BF', 'center'), cell('Value', true, '1E293B', '2DD4BF', 'center') ],
+      [ cell('Total Registered Students', true, '0F172A', 'FFFFFF'), cell(total, true, '0F172A', '2DD4BF', 'center') ],
+      [ cell('Total Attendance Records', true, '0F172A', 'FFFFFF'), cell(totalAtt, true, '0F172A', '2DD4BF', 'center') ],
+      [ cell('Active Students (≥1 session)', true, '0F172A', 'FFFFFF'), cell(active, true, '0F172A', '2DD4BF', 'center') ],
+      [ cell('Inactive Students (0 sessions)', true, '0F172A', 'FFFFFF'), cell(total-active, true, '0F172A', 'FCA5A5', 'center') ],
+      [ cell('Average Attendance per Student', true, '0F172A', 'FFFFFF'), cell(avg, true, '0F172A', 'FCD34D', 'center') ],
+      [],
+      [ cell('Top 5 Students by Attendance', true, '065F46', 'FFFFFF') ],
+      [ cell('Rank', true, '1E293B', '2DD4BF', 'center'), cell('Name', true, '1E293B', '2DD4BF'), cell('WhatsApp', true, '1E293B', '2DD4BF'), cell('Sessions', true, '1E293B', '2DD4BF', 'center') ],
+      ...[...allStudents].sort((a,b)=>b.dates.length-a.dates.length).slice(0,5).map((s,i)=>[
+        cell(i+1, false, '', '94A3B8', 'center'),
+        cell(s.name),
+        cell(s.number),
+        cell(s.dates.length, true, '', '2DD4BF', 'center')
+      ])
+    ];
+
+    const ws1 = XLSX.utils.aoa_to_sheet(sh1Data.map(row=>
+      Array.isArray(row) ? row.map(c => (c && c.v !== undefined) ? c : { v:'', t:'s' }) : [{ v:'', t:'s' }]
+    ));
+    // Merge title row across 2 columns
+    ws1['!merges'] = [
+      { s:{r:0,c:0}, e:{r:0,c:1} },
+      { s:{r:1,c:0}, e:{r:1,c:1} },
+      { s:{r:10,c:0}, e:{r:10,c:3} }
+    ];
+    ws1['!cols'] = [{ wch:38 }, { wch:18 }, { wch:18 }, { wch:12 }];
+
+    // Apply cell styles back (aoa_to_sheet loses .s; re-apply manually)
+    sh1Data.forEach((row, ri) => {
+      if (!Array.isArray(row)) return;
+      row.forEach((cellObj, ci) => {
+        if (!cellObj || cellObj.v === undefined) return;
+        const addr = XLSX.utils.encode_cell({ r:ri, c:ci });
+        if (ws1[addr]) ws1[addr].s = cellObj.s;
+      });
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws1, '📊 Dashboard');
+
+    // ────────────────────────────
+    // SHEET 2 — Registered Students
+    // ────────────────────────────
+    const sh2Rows = [
+      ['#', 'Student Name', 'WhatsApp Number', 'Registration Date', 'Total Sessions'],
+      ...allStudents.map((s,i)=>[
+        i+1,
+        s.name,
+        s.number,
+        tsToDate(s.createdAt),
+        s.dates.length
+      ])
+    ];
+    const ws2 = XLSX.utils.aoa_to_sheet(sh2Rows);
+    ws2['!cols'] = [{ wch:5 }, { wch:28 }, { wch:18 }, { wch:18 }, { wch:14 }];
+
+    // Style header row
+    ['A1','B1','C1','D1','E1'].forEach(addr => {
+      if (ws2[addr]) ws2[addr].s = {
+        font:{ bold:true, color:{ rgb:'FFFFFF' } },
+        fill:{ fgColor:{ rgb:'0F766E' }, patternType:'solid' },
+        alignment:{ horizontal:'center', vertical:'center' }
+      };
+    });
+    XLSX.utils.book_append_sheet(wb, ws2, '👥 Registered Students');
+
+    // ────────────────────────────
+    // SHEET 3 — Attendance Records
+    // ────────────────────────────
+    // One row per student — list all their dates in one cell (pipe-separated)
+    const sh3Rows = [
+      ['#', 'Student Name', 'WhatsApp Number', 'Total Sessions', 'Attendance Dates'],
+      ...[...allStudents]
+        .filter(s=>s.dates.length>0)
+        .sort((a,b)=>b.dates.length-a.dates.length)
+        .map((s,i)=>[
+          i+1,
+          s.name,
+          s.number,
+          s.dates.length,
+          s.dates.join(' | ')
+        ])
+    ];
+    const ws3 = XLSX.utils.aoa_to_sheet(sh3Rows);
+    ws3['!cols'] = [{ wch:5 }, { wch:28 }, { wch:18 }, { wch:14 }, { wch:60 }];
+    ['A1','B1','C1','D1','E1'].forEach(addr => {
+      if (ws3[addr]) ws3[addr].s = {
+        font:{ bold:true, color:{ rgb:'FFFFFF' } },
+        fill:{ fgColor:{ rgb:'065F46' }, patternType:'solid' },
+        alignment:{ horizontal:'center', vertical:'center' }
+      };
+    });
+    XLSX.utils.book_append_sheet(wb, ws3, '✅ Attendance Records');
+
+    // ────────────────────────────
+    // SHEET 4 — Attendance By Date
+    // ────────────────────────────
+    const dateEntries = Object.entries(dateCounts).sort((a,b)=>a[0].localeCompare(b[0]));
+    const sh4Rows = [
+      ['Session Date', 'Day', 'Students Present', 'Names'],
+      ...dateEntries.map(([date, cnt])=>{
+        const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date(date+'T00:00:00').getDay()];
+        const names = allStudents.filter(s=>s.dates.includes(date)).map(s=>s.name).join(', ');
+        return [date, dayName, cnt, names];
+      })
+    ];
+    const ws4 = XLSX.utils.aoa_to_sheet(sh4Rows);
+    ws4['!cols'] = [{ wch:14 }, { wch:12 }, { wch:18 }, { wch:70 }];
+    ['A1','B1','C1','D1'].forEach(addr => {
+      if (ws4[addr]) ws4[addr].s = {
+        font:{ bold:true, color:{ rgb:'FFFFFF' } },
+        fill:{ fgColor:{ rgb:'1E293B' }, patternType:'solid' },
+        alignment:{ horizontal:'center', vertical:'center' }
+      };
+    });
+    // Highlight weekend rows (Sat/Sun) with a subtle teal tint
+    dateEntries.forEach(([date], i) => {
+      const dayIdx = new Date(date+'T00:00:00').getDay();
+      if (dayIdx === 0 || dayIdx === 6) {
+        ['A','B','C','D'].forEach(col => {
+          const addr = col + (i+2);
+          if (ws4[addr]) ws4[addr].s = {
+            fill:{ fgColor:{ rgb:'0D3D38' }, patternType:'solid' },
+            alignment:{ vertical:'center' }
+          };
+        });
+      }
+    });
+    XLSX.utils.book_append_sheet(wb, ws4, '📅 By Date');
+
+    // ── Write and trigger download ──
+    XLSX.writeFile(wb, `Alburhan_Attendance_${TODAY}.xlsx`);
   };
+
 </script>
 </body>
 </html>
