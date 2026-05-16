@@ -339,7 +339,7 @@
       <textarea class="inp" id="absentReason" placeholder="غیر حاضری کی وجہ درج کریں..."></textarea>
     </div>
 
-    <button class="btn btn-amber" id="attBtn" onclick="markAttendance()">✋ حاضری جمع کریں</button>
+    <button class="btn btn-amber" id="attBtn" onclick="markAttendance()">✋ جمع کریں</button>
   </div>
 
   <div class="card">
@@ -502,7 +502,8 @@
 
   const bothDaysMsg = {
     icon: '🏆',
-    text: 'ما شاء اللہ! آپ دونوں دن تشریف لائے — اللہ پاک آپ کی اس پابندی کو قبول فرمائے اور آپ کو مزید ثابت قدمی عطا فرمائے۔ آمین'
+    text: 'ما شاء اللہ! آپ آج دن تشریف لائے — اللہ پاک آپ کی اس پابندی کو قبول فرمائے 🌸 نبی پاک ﷺ پر 3 مرتبہ درودِ پاک پڑھ لیں 🤍
+جزاک اللہ خیراً ✨'
   };
 
   function getRandMoti() {
@@ -637,7 +638,7 @@
         if (alreadyAbsent) { showMsg('attMsg','⚠️ آج کی غیر حاضری پہلے ہی درج ہو چکی ہے!','error'); return; }
         absents.push({ date: TODAY, reason });
         await updateDoc(doc(db,"students",ref.id), { absentRecords: absents });
-        showMsg('attMsg','✅ آپ کی غیر حاضری اور وجہ درج ہو گئی — ('+data.name+')','success');
+        showMsg('attMsg',' 🤲 اللہ پاک آپ کا اگلی کلاس میں آنا آسان فرمائے، آمین ✨ ✅  آپ کی غیر حاضری اور وجہ درج ہو گئی — ('+data.name+')','success');
       }
 
       document.getElementById('attNum').value = '';
@@ -681,7 +682,8 @@
         <div style="margin-top:.4rem">
           ${absents.map(a=>`<span class="badge badge-absent" title="${a.reason}">${a.date}</span>`).join('')}
         </div>` : ''}
-        ${showDua ? `<div class="dua-box">🤲 اللہ پاک آپ کو علم حاصل کرنے میں استقامت دے — آمین</div>` : ''}
+        ${showDua ? `<div class="dua-box"> 🌸 نبی پاک ﷺ پر 3 مرتبہ درودِ پاک پڑھ لیں 🤍
+جزاک اللہ خیراً ✨ 🤲 اللہ پاک آپ کو علم حاصل کرنے میں استقامت دے — آمین</div>` : ''}
       </div>`;
       showMsg('checkMsg','✅ ریکارڈ مل گیا','success');
     } catch(e) { showMsg('checkMsg','❌ '+e.message,'error'); }
